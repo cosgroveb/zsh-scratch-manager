@@ -1,0 +1,36 @@
+#compdef scratch
+
+# Completion for scratch command
+
+_scratch() {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    _arguments -s \
+        '-t[Create in /tmp (volatile)]' \
+        '-H[Set HOME to scratch directory (isolated)]' \
+        '-l[List existing scratch directories]' \
+        '--list[List existing scratch directories]' \
+        '-c[Run cleanup now]' \
+        '--cleanup[Run cleanup now]' \
+        '-h[Show help]' \
+        '--help[Show help]' \
+        '1:prefix:->prefix'
+
+    case "$state" in
+        prefix)
+            # Suggest common prefixes
+            local -a prefixes
+            prefixes=(
+                'tmp:Default temporary prefix'
+                'test:Testing and experimentation'
+                'debug:Debugging session'
+                'scratch:General scratch work'
+                'experiment:Experimental code'
+            )
+            _describe 'prefix' prefixes
+            ;;
+    esac
+}
+
+_scratch "$@"
