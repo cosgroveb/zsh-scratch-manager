@@ -2,12 +2,11 @@
 
 A zsh plugin for creating temporary scratch directories with automatic cleanup.
 
-## Features
-
-- Create scratch directories with random suffixes to avoid collisions
-- Optional `/tmp` location for volatile scratch dirs
-- Auto-cleanup of abandoned directories (configurable)
-- Works with zinit, antibody, sheldon, oh-my-zsh, or direct sourcing
+```zsh
+$ scratch myproject
+~/scratch/myproject.x2Lm
+$ # hack away, then just leave - it cleans itself up
+```
 
 ## Installation
 
@@ -50,29 +49,9 @@ source /path/to/zsh-scratch-manager/scratch-manager.plugin.zsh
 ```
 scratch [prefix]         # Create ~/scratch/<prefix>.XXXX and cd into it
 scratch -t [prefix]      # Create in /tmp (volatile, cleared on reboot)
-scratch -H [prefix]      # Create with HOME set to scratch dir
-scratch -tH [prefix]     # Both: /tmp + HOME isolation
 scratch -l, --list       # List existing scratch directories
 scratch -c, --cleanup    # Run cleanup now
 scratch --help           # Show help
-```
-
-### Examples
-
-```zsh
-# Quick temporary directory
-scratch
-# -> Creates ~/scratch/tmp.a3Kf and cd's into it
-
-# Named scratch for a specific task
-scratch myproject
-# -> Creates ~/scratch/myproject.x2Lm
-
-# Volatile scratch that disappears on reboot
-scratch -t experiment
-
-# Return to previous directory
-popd
 ```
 
 ## Configuration
@@ -80,17 +59,10 @@ popd
 Set these environment variables before loading the plugin:
 
 ```zsh
-# Where scratch directories are created (default: ~/scratch)
-export SCRATCH_DIR=~/scratch
-
-# How often to check for cleanup, in seconds (default: 3600 = 1 hour)
-export SCRATCH_CLEANUP_PERIOD=3600
-
-# Only clean directories older than this, in seconds (default: 3600)
-export SCRATCH_CLEANUP_AGE=3600
-
-# Default prefix when none specified (default: tmp)
-export SCRATCH_DEFAULT_PREFIX=tmp
+export SCRATCH_DIR=~/scratch           # Where scratches are created
+export SCRATCH_CLEANUP_PERIOD=3600     # Cleanup check interval (seconds)
+export SCRATCH_CLEANUP_AGE=3600        # Min age before cleanup (seconds)
+export SCRATCH_DEFAULT_PREFIX=tmp      # Default prefix when none given
 ```
 
 ## Aliases and Key Bindings
@@ -101,7 +73,6 @@ Add to your `.zshrc` after loading the plugin:
 # Short aliases
 alias t='scratch'
 alias tt='scratch -t'
-alias th='scratch -H'
 
 # Key binding: Ctrl+S to create scratch and cd into it
 scratch-widget() { scratch && zle reset-prompt }
@@ -111,24 +82,22 @@ bindkey '^S' scratch-widget
 
 ## Auto-Cleanup
 
-The plugin automatically cleans up abandoned scratch directories:
+Abandoned scratch directories are cleaned up automatically in the background.
 
-- **When:** Every `SCRATCH_CLEANUP_PERIOD` seconds, and on shell exit
-- **Async:** Cleanup runs in background to not block your prompt
+A directory is removed when ALL of these are true:
 
-### A directory is cleaned up if ALL of these are true:
-
-1. No visible files (empty or only hidden tool dirs like `.local`, `.config`)
-2. No `.git` directory (real projects are preserved)
+1. No visible files (empty or only hidden tool dirs)
+2. No `.git` directory
 3. No shell has it as current working directory
 4. Older than `SCRATCH_CLEANUP_AGE`
 
-### Preserved automatically:
+## Features
 
-- Directories with any visible files
-- Git repositories (contain `.git`)
-- Directories with user dotfiles (`.env`, `.envrc`, etc.)
-- Directories currently in use by any shell
+- Random suffixes to avoid collisions
+- Optional `/tmp` location for volatile scratch dirs
+- Auto-cleanup of abandoned directories
+- Tab completion
+- Works with zinit, antibody, sheldon, oh-my-zsh, or direct sourcing
 
 ## License
 
