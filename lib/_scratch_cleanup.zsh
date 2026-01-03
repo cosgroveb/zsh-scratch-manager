@@ -11,10 +11,10 @@ _scratch_cleanup() {
         return 0
     fi
 
-    local now
+    local now dir mtime age
     now=$(date +%s)
+    zmodload -F zsh/stat b:zstat 2>/dev/null
 
-    local dir
     for dir in "${base_dir}"/*(/N); do
         [[ -d "$dir" ]] || continue
 
@@ -29,8 +29,6 @@ _scratch_cleanup() {
         fi
 
         # Skip if too young
-        local mtime age
-        zmodload -F zsh/stat b:zstat 2>/dev/null
         if zstat -A mtime +mtime "$dir" &>/dev/null; then
             age=$((now - mtime[1]))
             if (( age < SCRATCH_CLEANUP_AGE )); then

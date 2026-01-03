@@ -8,18 +8,16 @@ _scratch_list() {
         return 0
     fi
 
-    local now
+    local now dir dir_name mtime age age_str in_use is_git
     now=$(date +%s)
+    zmodload -F zsh/stat b:zstat 2>/dev/null
 
-    local dir
     for dir in "${base_dir}"/*(/N); do
         [[ -d "$dir" ]] || continue
 
-        local dir_name="${dir:t}"
-        local mtime age age_str
+        dir_name="${dir:t}"
 
-        # Get modification time using zsh stat
-        zmodload -F zsh/stat b:zstat 2>/dev/null
+        # Get modification time
         if zstat -A mtime +mtime "$dir" &>/dev/null; then
             age=$((now - mtime[1]))
             age_str=$(_format_age $age)
@@ -28,13 +26,13 @@ _scratch_list() {
         fi
 
         # Check if in use (any shell has CWD in this dir)
-        local in_use=""
+        in_use=""
         if _scratch_dir_in_use "$dir"; then
             in_use=" [in use]"
         fi
 
         # Check if it's a git repo
-        local is_git=""
+        is_git=""
         if [[ -d "${dir}/.git" ]]; then
             is_git=" [git]"
         fi
