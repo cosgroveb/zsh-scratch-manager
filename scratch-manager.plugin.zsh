@@ -32,6 +32,10 @@ if [[ -f "${SCRATCH_MANAGER_DIR}/functions/_scratch" ]] && (( $+functions[compde
     compdef _scratch scratch
 fi
 
+# Widget for key binding (bind with: bindkey '^S' scratch-widget)
+scratch-widget() { scratch && zle reset-prompt }
+zle -N scratch-widget
+
 # Auto-cleanup setup
 # Run cleanup periodically (uses zsh periodic hook)
 PERIOD="${SCRATCH_CLEANUP_PERIOD}"

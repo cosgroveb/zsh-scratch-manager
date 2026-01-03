@@ -70,14 +70,9 @@ export SCRATCH_DEFAULT_PREFIX=tmp      # Default prefix when none given
 Add to your `.zshrc` after loading the plugin:
 
 ```zsh
-# Short aliases
 alias t='scratch'
 alias tt='scratch -t'
-
-# Key binding: Ctrl+S to create scratch and cd into it
-scratch-widget() { scratch && zle reset-prompt }
-zle -N scratch-widget
-bindkey '^S' scratch-widget
+bindkey '^S' scratch-widget   # Ctrl+S to create scratch
 ```
 
 ## Auto-Cleanup
