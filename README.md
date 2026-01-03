@@ -6,9 +6,7 @@ A zsh plugin for creating temporary scratch directories with automatic cleanup.
 
 - Create scratch directories with random suffixes to avoid collisions
 - Optional `/tmp` location for volatile scratch dirs
-- Optional `HOME` isolation for testing tools with clean config
 - Auto-cleanup of abandoned directories (configurable)
-- Tab completion for flags and common prefixes
 - Works with zinit, antibody, sheldon, oh-my-zsh, or direct sourcing
 
 ## Installation
@@ -72,11 +70,6 @@ scratch myproject
 
 # Volatile scratch that disappears on reboot
 scratch -t experiment
-
-# Isolated environment for testing tools
-scratch -H tooltest
-# -> Creates ~/scratch/tooltest.p4Qr with HOME set to it
-# -> Tools like npm, cargo, etc. will use fresh configs
 
 # Return to previous directory
 popd
