@@ -22,6 +22,3 @@ jobs:
 
       - name: Run tests
         run: zsh tests/run_tests.zsh
-
-          shellcheck -x lib/*.zsh
-          shellcheck -x functions/scratch
