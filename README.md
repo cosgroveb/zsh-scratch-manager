@@ -3,9 +3,14 @@
 A zsh plugin for creating temporary scratch directories with automatic cleanup.
 
 ```zsh
-$ scratch myproject
-~/scratch/myproject.x2Lm
-$ # hack away, then just leave - it cleans itself up
+# .zshrc
+bindkey '^S' scratch-widget
+```
+
+```zsh
+$ # press Ctrl+S
+~/scratch/tmp.x2Lm
+$ # hack away
 ```
 
 ## Installation
