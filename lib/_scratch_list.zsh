@@ -20,8 +20,8 @@ _scratch_list() {
 
         # Get modification time using zsh stat
         zmodload -F zsh/stat b:zstat 2>/dev/null
-        if zstat -A mtime +mtime "$dir" 2>/dev/null; then
-            age=$((now - mtime))
+        if zstat -A mtime +mtime "$dir" &>/dev/null; then
+            age=$((now - mtime[1]))
             age_str=$(_format_age $age)
         else
             age_str="?"
