@@ -13,6 +13,18 @@ $ # press Ctrl+S
 $ # hack away
 ```
 
+Or add an alias:
+
+```zsh
+# .zshrc
+alias t='scratch'
+```
+
+```zsh
+$ t myproject
+~/scratch/myproject.x2Lm
+```
+
 ## Installation
 
 ### zinit
