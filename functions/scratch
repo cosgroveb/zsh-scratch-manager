@@ -1,0 +1,139 @@
+#autoload
+
+# scratch - Create and manage temporary scratch directories
+#
+# Usage:
+#   scratch [prefix]         Create scratch dir in $SCRATCH_DIR
+#   scratch -t [prefix]      Create in /tmp (volatile)
+#   scratch -H [prefix]      Create with HOME set to scratch dir
+#   scratch -tH [prefix]     Create in /tmp with HOME isolation
+#   scratch -l, --list       List existing scratch directories
+#   scratch -c, --cleanup    Run cleanup now
+#   scratch --help           Show help
+
+local opt_tmp=0
+local opt_home=0
+local opt_list=0
+local opt_cleanup=0
+local opt_help=0
+
+# Parse options
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -t)
+            opt_tmp=1
+            shift
+            ;;
+        -H)
+            opt_home=1
+            shift
+            ;;
+        -tH|-Ht)
+            opt_tmp=1
+            opt_home=1
+            shift
+            ;;
+        -l|--list)
+            opt_list=1
+            shift
+            ;;
+        -c|--cleanup)
+            opt_cleanup=1
+            shift
+            ;;
+        -h|--help)
+            opt_help=1
+            shift
+            ;;
+        -*)
+            echo "scratch: unknown option: $1" >&2
+            echo "Try 'scratch --help' for usage information." >&2
+            return 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+# Handle --help
+if (( opt_help )); then
+    cat <<'EOF'
+scratch - Create and manage temporary scratch directories
+
+Usage:
+  scratch [prefix]         Create scratch dir in $SCRATCH_DIR (default: ~/scratch)
+  scratch -t [prefix]      Create in /tmp (volatile, cleared on reboot)
+  scratch -H [prefix]      Create with HOME set to scratch dir (isolated)
+  scratch -tH [prefix]     Create in /tmp with HOME isolation
+  scratch -l, --list       List existing scratch directories
+  scratch -c, --cleanup    Run cleanup now
+  scratch --help           Show this help
+
+Configuration (environment variables):
+  SCRATCH_DIR             Base directory (default: ~/scratch)
+  SCRATCH_CLEANUP_PERIOD  Auto-cleanup interval in seconds (default: 3600)
+  SCRATCH_CLEANUP_AGE     Min age before cleanup in seconds (default: 3600)
+  SCRATCH_DEFAULT_PREFIX  Default prefix when none given (default: tmp)
+
+Examples:
+  scratch                  # Create ~/scratch/tmp.XXXX
+  scratch myproject        # Create ~/scratch/myproject.XXXX
+  scratch -t experiment    # Create /tmp/experiment.XXXX
+  scratch -H isolated      # Create ~/scratch/isolated.XXXX with HOME isolation
+EOF
+    return 0
+fi
+
+# Handle --list
+if (( opt_list )); then
+    _scratch_list
+    return $?
+fi
+
+# Handle --cleanup
+if (( opt_cleanup )); then
+    _scratch_cleanup
+    return $?
+fi
+
+# Create mode
+local prefix="${1:-${SCRATCH_DEFAULT_PREFIX}}"
+local base_dir="${SCRATCH_DIR}"
+
+# Use /tmp if -t flag
+if (( opt_tmp )); then
+    base_dir="/tmp"
+fi
+
+# Save current SCRATCH_DIR and override if using /tmp
+local saved_scratch_dir="$SCRATCH_DIR"
+if (( opt_tmp )); then
+    SCRATCH_DIR="$base_dir"
+fi
+
+local scratch_dir
+scratch_dir=$(_scratch_create "$prefix")
+local create_exit=$?
+
+# Restore SCRATCH_DIR
+SCRATCH_DIR="$saved_scratch_dir"
+
+if [[ $create_exit -ne 0 ]]; then
+    return 1
+fi
+
+# Navigate to the scratch directory
+if ! pushd "$scratch_dir" > /dev/null 2>&1; then
+    echo "scratch: failed to change to directory: $scratch_dir" >&2
+    return 1
+fi
+
+# Set HOME if -H flag
+if (( opt_home )); then
+    export HOME="$scratch_dir"
+    echo "HOME set to: $scratch_dir"
+fi
+
+echo "$scratch_dir"
+return 0

@@ -42,3 +42,14 @@ test_creates_unique_directories() {
     assert_not_equals "$dir1" "$dir2" "Each scratch dir should be unique" || return 1
 }
 run_test "creates unique directories each time" test_creates_unique_directories
+
+test_scratch_changes_to_directory() {
+    local original_dir="$PWD"
+
+    # Run scratch in a subshell and capture the directory
+    local scratch_dir
+    scratch_dir=$(scratch "mytest" 2>&1 | grep "^${SCRATCH_DIR}")
+
+    assert_directory_exists "$scratch_dir" "Scratch dir should exist" || return 1
+}
+run_test "scratch creates and outputs directory path" test_scratch_changes_to_directory
