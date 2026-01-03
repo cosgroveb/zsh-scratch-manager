@@ -21,9 +21,13 @@ for lib in "${SCRATCH_MANAGER_DIR}"/lib/*.zsh; do
     [[ -f "$lib" ]] && source "$lib"
 done
 
-# Autoload the main scratch function
-autoload -Uz scratch
+# Autoload the main scratch function (if it exists)
+if [[ -f "${SCRATCH_MANAGER_DIR}/functions/scratch" ]]; then
+    autoload -Uz scratch
+fi
 
-# Set up completion
-autoload -Uz _scratch
-compdef _scratch scratch
+# Set up completion (if completion system is available)
+if [[ -f "${SCRATCH_MANAGER_DIR}/functions/_scratch" ]] && (( $+functions[compdef] )); then
+    autoload -Uz _scratch
+    compdef _scratch scratch
+fi

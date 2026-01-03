@@ -1,7 +1,6 @@
 #!/usr/bin/env zsh
 # Test runner for zsh-scratch-manager
-
-set -e
+# Note: Don't use set -e as test assertions intentionally return non-zero
 
 SCRIPT_DIR="${0:A:h}"
 PROJECT_DIR="${SCRIPT_DIR:h}"
