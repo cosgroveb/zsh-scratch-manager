@@ -1,5 +1,7 @@
 # zsh-scratch-manager
 
+[![CI](https://github.com/cosgroveb/zsh-scratch-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/cosgroveb/zsh-scratch-manager/actions/workflows/ci.yml)
+
 A zsh plugin for creating temporary scratch directories with automatic cleanup.
 
 ```zsh
