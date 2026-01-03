@@ -113,6 +113,10 @@ A directory is removed when ALL of these are true:
 - Tab completion
 - Works with zinit, antibody, sheldon, oh-my-zsh, or direct sourcing
 
+## Inspiration
+
+Inspired by [jtm's comment](https://lobste.rs/s/ktw3bz/you_should_use_tmp_more#c_fxm5tw) on Lobste.rs.
+
 ## License
 
 MIT
