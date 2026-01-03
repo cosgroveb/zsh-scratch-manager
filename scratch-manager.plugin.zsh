@@ -31,3 +31,21 @@ if [[ -f "${SCRATCH_MANAGER_DIR}/functions/_scratch" ]] && (( $+functions[compde
     autoload -Uz _scratch
     compdef _scratch scratch
 fi
+
+# Auto-cleanup setup
+# Run cleanup periodically (uses zsh periodic hook)
+PERIOD="${SCRATCH_CLEANUP_PERIOD}"
+
+periodic() {
+    # Run cleanup asynchronously to not block the prompt
+    { _scratch_cleanup } &!
+}
+
+# Run cleanup on shell exit
+_scratch_zshexit() {
+    _scratch_cleanup 2>/dev/null
+}
+
+# Add to zshexit hooks
+autoload -Uz add-zsh-hook
+add-zsh-hook zshexit _scratch_zshexit
