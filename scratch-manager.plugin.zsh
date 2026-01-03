@@ -42,12 +42,12 @@ PERIOD="${SCRATCH_CLEANUP_PERIOD}"
 
 periodic() {
     # Run cleanup asynchronously to not block the prompt
-    { _scratch_cleanup } &!
+    { _scratch_cleanup } &>/dev/null &!
 }
 
 # Run cleanup on shell exit
 _scratch_zshexit() {
-    _scratch_cleanup 2>/dev/null
+    _scratch_cleanup &>/dev/null
 }
 
 # Add to zshexit hooks
