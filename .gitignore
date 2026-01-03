@@ -1,0 +1,13 @@
+# Test artifacts
+tests/tmp/
+*.log
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

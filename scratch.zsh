@@ -1,0 +1,1 @@
+scratch-manager.plugin.zsh
