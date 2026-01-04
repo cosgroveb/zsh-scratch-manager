@@ -1,9 +1,6 @@
 #!/usr/bin/env zsh
 # Cleanup abandoned scratch directories
 
-# Hidden directories created by tools that don't indicate user work
-typeset -ga _SCRATCH_TOOL_DIRS=(.local .config .cache .npm .yarn .pnpm)
-
 _scratch_cleanup() {
     local base_dir="${SCRATCH_DIR}"
 
@@ -45,7 +42,7 @@ _scratch_cleanup() {
 
 _scratch_dir_is_empty() {
     local dir="$1"
-    local item item_name is_tool_dir tool_dir_name
+    local item item_name is_ignored ignored
 
     # Check for any visible files (not starting with .)
     local visible_files
@@ -58,20 +55,20 @@ _scratch_dir_is_empty() {
     for item in "${dir}"/.[^.]*(N); do
         item_name="${item:t}"
 
-        # If it's a known tool directory, skip it (doesn't count as user content)
-        is_tool_dir=0
-        for tool_dir_name in "${_SCRATCH_TOOL_DIRS[@]}"; do
-            if [[ "$item_name" == "$tool_dir_name" ]]; then
-                is_tool_dir=1
+        # If it's in the ignore list, skip it (doesn't count as user content)
+        is_ignored=0
+        for ignored in "${SCRATCH_IGNORE_HIDDEN[@]}"; do
+            if [[ "$item_name" == "$ignored" ]]; then
+                is_ignored=1
                 break
             fi
         done
 
-        if (( is_tool_dir )); then
+        if (( is_ignored )); then
             continue
         fi
 
-        # Found a hidden file/dir that's not a tool dir - user content exists
+        # Found a hidden file/dir not in ignore list - user content exists
         return 1
     done
 

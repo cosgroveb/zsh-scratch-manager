@@ -82,6 +82,9 @@ export SCRATCH_DIR=~/scratch           # Where scratches are created
 export SCRATCH_CLEANUP_PERIOD=3600     # Cleanup check interval (seconds)
 export SCRATCH_CLEANUP_AGE=3600        # Min age before cleanup (seconds)
 export SCRATCH_DEFAULT_PREFIX=tmp      # Default prefix when none given
+
+# Hidden files/dirs ignored during cleanup (default shown)
+SCRATCH_IGNORE_HIDDEN=(.local .config .cache .npm .yarn .pnpm .claude)
 ```
 
 ## Aliases and Key Bindings

@@ -13,6 +13,11 @@ SCRATCH_MANAGER_DIR="${0:A:h}"
 : ${SCRATCH_CLEANUP_AGE:=3600}
 : ${SCRATCH_DEFAULT_PREFIX:=tmp}
 
+# Hidden files/dirs ignored during cleanup (don't count as user content)
+if [[ -z "${SCRATCH_IGNORE_HIDDEN+x}" ]]; then
+    SCRATCH_IGNORE_HIDDEN=(.local .config .cache .npm .yarn .pnpm .claude)
+fi
+
 # Add functions to fpath for autoloading
 fpath=("${SCRATCH_MANAGER_DIR}/functions" $fpath)
 
