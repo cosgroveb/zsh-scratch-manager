@@ -5,12 +5,12 @@
 A zsh plugin for creating temporary scratch directories with automatic cleanup.
 
 ```zsh
-# .zshrc
-bindkey '^S' scratch-widget
+# .zshrc (^G is usually send-break, rarely used)
+bindkey '^G' scratch-widget
 ```
 
 ```zsh
-$ # press Ctrl+S
+$ # press Ctrl+G
 ~/scratch/tmp.x2Lm
 $ # hack away
 ```
@@ -94,7 +94,7 @@ Add to your `.zshrc` after loading the plugin:
 ```zsh
 alias t='scratch'
 alias tt='scratch -t'
-bindkey '^S' scratch-widget   # Ctrl+S to create scratch
+bindkey '^G' scratch-widget   # Ctrl+G to create scratch
 ```
 
 ## Auto-Cleanup
