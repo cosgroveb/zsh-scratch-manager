@@ -50,9 +50,9 @@ periodic() {
     { _scratch_cleanup } &>/dev/null &!
 }
 
-# Run cleanup on shell exit
+# Run cleanup on shell exit (async to avoid blocking shell exit)
 _scratch_zshexit() {
-    _scratch_cleanup &>/dev/null
+    { _scratch_cleanup } &>/dev/null &!
 }
 
 # Add to zshexit hooks
