@@ -61,9 +61,8 @@ _scratch_dir_in_use() {
     # Platform-specific CWD detection
     if [[ -d /proc ]]; then
         # Linux: check /proc/*/cwd symlinks
-        local proc_dir
+        local proc_dir cwd
         for proc_dir in /proc/[0-9]*/cwd(N); do
-            local cwd
             cwd=$(readlink "$proc_dir" 2>/dev/null) || continue
             if [[ "$cwd" == "$dir" || "$cwd" == "$dir"/* ]]; then
                 return 0
