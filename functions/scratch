@@ -9,12 +9,14 @@
 #   scratch -tH [prefix]     Create in /tmp with HOME isolation
 #   scratch -l, --list       List existing scratch directories
 #   scratch -c, --cleanup    Run cleanup now
+#   scratch --pick           Pick an existing scratch directory
 #   scratch --help           Show help
 
 local opt_tmp=0
 local opt_home=0
 local opt_list=0
 local opt_cleanup=0
+local opt_pick=0
 local opt_help=0
 
 # Parse options
@@ -39,6 +41,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -c|--cleanup)
             opt_cleanup=1
+            shift
+            ;;
+        --pick)
+            opt_pick=1
             shift
             ;;
         -h|--help)
@@ -68,6 +74,7 @@ Usage:
   scratch -tH [prefix]     Create in /tmp with HOME isolation
   scratch -l, --list       List existing scratch directories
   scratch -c, --cleanup    Run cleanup now
+  scratch --pick           Pick an existing scratch directory
   scratch --help           Show this help
 
 Configuration (environment variables):
@@ -81,8 +88,21 @@ Examples:
   scratch myproject        # Create ~/scratch/myproject.XXXX
   scratch -t experiment    # Create /tmp/experiment.XXXX
   scratch -H isolated      # Create ~/scratch/isolated.XXXX with HOME isolation
+  scratch --pick           # Pick an existing scratch directory
 EOF
     return 0
+fi
+
+local action_count=$((opt_list + opt_cleanup + opt_pick))
+
+if (( action_count > 1 )); then
+    echo "scratch: choose one action: --list, --cleanup, or --pick" >&2
+    return 1
+fi
+
+if (( action_count > 0 && (opt_tmp || opt_home) )); then
+    echo "scratch: -t and -H only apply when creating a scratch directory" >&2
+    return 1
 fi
 
 # Handle --list
@@ -94,6 +114,17 @@ fi
 # Handle --cleanup
 if (( opt_cleanup )); then
     _scratch_cleanup
+    return $?
+fi
+
+# Handle --pick
+if (( opt_pick )); then
+    if [[ $# -gt 0 ]]; then
+        echo "scratch: --pick does not accept a prefix" >&2
+        return 1
+    fi
+
+    _scratch_pick
     return $?
 fi
 

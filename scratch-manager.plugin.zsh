@@ -37,6 +37,21 @@ if [[ -f "${SCRATCH_MANAGER_DIR}/functions/_scratch" ]] && (( $+functions[compde
     compdef _scratch scratch
 fi
 
+# Convenience wrappers for picker mode
+sff() { scratch --pick "$@"; }
+
+sfp() {
+    local scratch_dir
+    scratch_dir=$(scratch --pick "$@") || return 1
+
+    if ! pushd "$scratch_dir" > /dev/null 2>&1; then
+        echo "scratch: failed to change to directory: $scratch_dir" >&2
+        return 1
+    fi
+
+    echo "$scratch_dir"
+}
+
 # Widget for key binding (bind with: bindkey '^S' scratch-widget)
 scratch-widget() { scratch && zle reset-prompt }
 zle -N scratch-widget

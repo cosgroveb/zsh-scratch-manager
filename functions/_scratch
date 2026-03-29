@@ -13,9 +13,10 @@ _scratch() {
         '--list[List existing scratch directories]' \
         '-c[Run cleanup now]' \
         '--cleanup[Run cleanup now]' \
+        '--pick[Pick an existing scratch directory]' \
         '-h[Show help]' \
         '--help[Show help]' \
-        '1:prefix:->prefix'
+        '(-l --list -c --cleanup --pick -h --help)1:prefix:->prefix'
 
     case "$state" in
         prefix)

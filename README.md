@@ -70,6 +70,9 @@ scratch [prefix]         # Create ~/scratch/<prefix>.XXXX and cd into it
 scratch -t [prefix]      # Create in /tmp (volatile, cleared on reboot)
 scratch -l, --list       # List existing scratch directories
 scratch -c, --cleanup    # Run cleanup now
+scratch --pick           # Pick an existing scratch directory and print its path
+sff                      # Convenience wrapper for scratch --pick
+sfp                      # Pick an existing scratch directory and pushd into it
 scratch --help           # Show help
 ```
 
@@ -96,6 +99,10 @@ alias t='scratch'
 alias tt='scratch -t'
 bindkey '^G' scratch-widget   # Ctrl+G to create scratch
 ```
+
+If `fzf` is installed, `scratch --pick` uses it for interactive selection. If
+`lsd` is installed, the picker preview shows a tree view of the highlighted
+scratch directory.
 
 ## Auto-Cleanup
 
