@@ -4,6 +4,7 @@
 typeset -ga _scratch_inventory_paths
 typeset -ga _scratch_inventory_labels
 typeset -ga _scratch_inventory_tokens
+typeset -ga _scratch_inventory_picker_rows
 
 _scratch_inventory_load() {
     local base_dir="${SCRATCH_DIR}"
@@ -12,17 +13,22 @@ _scratch_inventory_load() {
     _scratch_inventory_paths=()
     _scratch_inventory_labels=()
     _scratch_inventory_tokens=()
+    _scratch_inventory_picker_rows=()
 
     if [[ ! -d "$base_dir" ]]; then
         return 0
     fi
 
-    local now dir dir_name mtime age age_str label tokens
+    local now dir dir_name mtime age age_str label tokens picker_row
+    local in_use=0
+    local has_git=0
     now=$(date +%s)
     zmodload -F zsh/stat b:zstat 2>/dev/null
 
     for dir in "${base_dir}"/*(/N); do
         [[ -d "$dir" ]] || continue
+        in_use=0
+        has_git=0
 
         dir_name="${dir:t}"
 
@@ -36,14 +42,17 @@ _scratch_inventory_load() {
         label="${dir_name}  (${age_str})"
 
         if _scratch_dir_in_use "$dir"; then
+            in_use=1
             label="${label} [in use]"
         fi
 
         if [[ -d "${dir}/.git" ]]; then
+            has_git=1
             label="${label} [git]"
         fi
 
         tokens=$(_scratch_search_tokens "$dir")
+        picker_row=$(_scratch_picker_row "$dir_name" "$age_str" "$tokens" "$in_use" "$has_git")
         insert_at=$(_scratch_inventory_insert_index "$mtime")
 
         _scratch_inventory_paths=(
@@ -60,6 +69,11 @@ _scratch_inventory_load() {
             "${_scratch_inventory_tokens[@]:0:$((insert_at - 1))}"
             "$tokens"
             "${_scratch_inventory_tokens[@]:$((insert_at - 1))}"
+        )
+        _scratch_inventory_picker_rows=(
+            "${_scratch_inventory_picker_rows[@]:0:$((insert_at - 1))}"
+            "$picker_row"
+            "${_scratch_inventory_picker_rows[@]:$((insert_at - 1))}"
         )
     done
 }
@@ -94,6 +108,70 @@ _scratch_search_tokens() {
                 printf "%s ", $0
             }'
     )
+}
+
+_scratch_visible_hints() {
+    local tokens="$1"
+    local limit=56
+    local entry output=""
+    local used=0
+    local remaining
+    local -a entries
+
+    entries=(${=tokens})
+
+    for entry in "${entries[@]}"; do
+        [[ -n "$entry" ]] || continue
+
+        remaining=$((limit - used))
+        (( remaining <= 0 )) && break
+
+        if (( used == 0 )); then
+            if (( ${#entry} > remaining )); then
+                output="${entry[1,$((remaining - 2))]}.."
+                break
+            fi
+            output="$entry"
+            used=${#entry}
+            continue
+        fi
+
+        if (( ${#entry} + 1 > remaining )); then
+            output="${output} .."
+            break
+        fi
+
+        output="${output} ${entry}"
+        used=$((used + ${#entry} + 1))
+    done
+
+    print -r -- "$output"
+}
+
+_scratch_picker_row() {
+    local dir_name="$1"
+    local age_str="$2"
+    local tokens="$3"
+    local in_use="$4"
+    local has_git="$5"
+    local hints label
+    local reset=$'\033[0m'
+    local dim=$'\033[90m'
+    local yellow=$'\033[33m'
+    local green=$'\033[32m'
+    local cyan=$'\033[36m'
+
+    label="${dir_name}  (${age_str})"
+    (( in_use )) && label="${label} ${yellow}[in use]${reset}"
+    (( has_git )) && label="${label} ${green}[git]${reset}"
+
+    hints=$(_scratch_visible_hints "$tokens")
+    [[ -n "$hints" ]] || {
+        print -r -- "$label"
+        return 0
+    }
+
+    print -r -- "${label} ${dim}|${reset} ${cyan}${hints}${reset}"
 }
 
 _scratch_format_age() {

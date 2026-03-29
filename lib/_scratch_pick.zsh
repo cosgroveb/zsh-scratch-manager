@@ -14,7 +14,7 @@ _scratch_pick() {
     fi
 
     for (( i = 1; i <= ${#_scratch_inventory_paths[@]}; i++ )); do
-        rows+=("${i}"$'\t'"${_scratch_inventory_labels[$i]}"$'\t'"$(_scratch_pick_hidden_tokens "${_scratch_inventory_tokens[$i]}")")
+        rows+=("${i}"$'\t'"${_scratch_inventory_picker_rows[$i]}"$'\t'"$(_scratch_pick_hidden_tokens "${_scratch_inventory_tokens[$i]}")")
     done
 
     if command -v fzf >/dev/null 2>&1; then

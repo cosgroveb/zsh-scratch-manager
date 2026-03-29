@@ -53,6 +53,15 @@ mkdir -p "${second_pick}/notes"
 echo "hello" > "${second_pick}/notes/needle.txt"
 cd "$START_DIR" || exit 1
 
+_scratch_inventory_load
+picker_row=""
+for picker_row in "${_scratch_inventory_picker_rows[@]}"; do
+    [[ "$picker_row" == *needle.txt* ]] || continue
+    break
+done
+[[ "$picker_row" == *$'|'* ]] || { echo "FAIL: picker row missing separator"; exit 1; }
+[[ "$picker_row" == *$'\033[36m'* ]] || { echo "FAIL: picker row missing hint color"; exit 1; }
+
 export PATH="${TEST_TMP}/bin:${PATH}"
 export SCRATCH_REAL_FZF="${REAL_FZF_BIN}"
 export SCRATCH_TEST_PICK_MATCH="needle.txt"
