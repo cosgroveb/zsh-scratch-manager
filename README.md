@@ -4,6 +4,19 @@
 
 A zsh plugin for creating temporary scratch directories with automatic cleanup.
 
+Add a keybinding:
+
+```zsh
+# .zshrc
+bindkey '^[o' scratch-find-or-create-widget   # Alt-o: open existing or create new
+```
+
+```zsh
+$ # press Alt+O
+~/scratch/tmp.x2Lm
+$ # reopen it later, or choose + new scratch from the picker
+```
+
 Add an alias:
 
 ```zsh
@@ -87,7 +100,8 @@ Add to your `.zshrc` after loading the plugin:
 ```zsh
 alias t='scratch'
 alias tt='scratch -t'
-bindkey '^G' scratch-widget
+bindkey '^[o' scratch-find-or-create-widget   # Alt-o: open existing or create new
+bindkey '^G' scratch-widget                   # Ctrl+G: always create a fresh scratch
 ```
 
 If `fzf` is installed, `scratch --pick` uses it for interactive selection. If
@@ -95,12 +109,6 @@ If `fzf` is installed, `scratch --pick` uses it for interactive selection. If
 scratch directory. The picker sorts newest-first and also matches shallow file
 and path names inside each scratch directory, so you can type `Gemfile`,
 `notes`, or `src/app` even when every scratch name is `tmp.*`.
-
-Optional find-or-create keybinding:
-
-```zsh
-bindkey '^[o' scratch-find-or-create-widget   # Alt-o: open existing or create new
-```
 
 ## Auto-Cleanup
 
