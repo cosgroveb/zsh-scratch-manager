@@ -14,7 +14,7 @@ _scratch_pick() {
     fi
 
     for (( i = 1; i <= ${#_scratch_inventory_paths[@]}; i++ )); do
-        rows+=("${i}"$'\t'"${_scratch_inventory_labels[$i]}")
+        rows+=("${i}"$'\t'"${_scratch_inventory_labels[$i]}"$'\t'"$(_scratch_pick_hidden_tokens "${_scratch_inventory_tokens[$i]}")")
     done
 
     if command -v fzf >/dev/null 2>&1; then
@@ -27,8 +27,9 @@ _scratch_pick() {
         selected=$(
             printf '%s\n' "${rows[@]}" |
                 SCRATCH_PICK_PATHS_FILE="$paths_file" fzf \
+                    --ansi \
                     --delimiter=$'\t' \
-                    --with-nth=2.. \
+                    --with-nth=2,3 \
                     --preview "$(_scratch_pick_preview_command)" \
                     --preview-window=right:60%
         )
@@ -55,6 +56,11 @@ _scratch_pick() {
     done
 
     return 1
+}
+
+_scratch_pick_hidden_tokens() {
+    local tokens="$1"
+    printf '\033[8m%s\033[0m' "$tokens"
 }
 
 _scratch_pick_preview_command() {

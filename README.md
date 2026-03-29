@@ -102,7 +102,9 @@ bindkey '^G' scratch-widget   # Ctrl+G to create scratch
 
 If `fzf` is installed, `scratch --pick` uses it for interactive selection. If
 `lsd` is installed, the picker preview shows a tree view of the highlighted
-scratch directory.
+scratch directory. The picker sorts newest-first and also matches shallow file
+and path names inside each scratch directory, so you can type `Gemfile`,
+`notes`, or `src/app` even when every scratch name is `tmp.*`.
 
 ## Auto-Cleanup
 

@@ -10,6 +10,7 @@ export SCRATCH_CLEANUP_AGE=3600
 mkdir -p "$SCRATCH_DIR"
 mkdir -p "${TEST_TMP}/bin"
 START_DIR="$PWD"
+REAL_FZF_BIN="$(command -v fzf)"
 
 cleanup() { rm -rf "$TEST_TMP"; }
 trap cleanup EXIT
@@ -17,10 +18,18 @@ trap cleanup EXIT
 scratch_dir=$(scratch "test" 2>&1 | grep "^${SCRATCH_DIR}")
 [[ -d "$scratch_dir" ]] || { echo "FAIL: create"; exit 1; }
 [[ "$(_scratch_list)" == *"test."* ]] || { echo "FAIL: list"; exit 1; }
+touch -t 202001010000 "$scratch_dir"
 
 tab_dir=$(scratch $'tab\tname' 2>&1 | grep "^${SCRATCH_DIR}")
 [[ -d "$tab_dir" ]] || { echo "FAIL: tabbed create"; exit 1; }
 [[ "$(_scratch_list)" == *$'tab\tname.'* ]] || { echo "FAIL: list lost tabbed name"; exit 1; }
+touch -t 202001010000 "$tab_dir"
+
+scratch "old-order" > /dev/null 2>&1
+newest_dir=$(scratch "new-order" 2>&1 | grep "^${SCRATCH_DIR}")
+touch -t 202001010000 "${SCRATCH_DIR}"/old-order.*
+list_output=$(_scratch_list)
+[[ "${list_output%%$'\n'*}" == new-order.* ]] || { echo "FAIL: list did not sort newest first"; exit 1; }
 
 echo "x" > "${scratch_dir}/file.txt"
 SCRATCH_CLEANUP_AGE=0; touch -t 202001010000 "$scratch_dir"
@@ -34,26 +43,19 @@ _scratch_cleanup
 cat > "${TEST_TMP}/bin/fzf" <<'EOF'
 #!/usr/bin/env zsh
 
-while [[ $# -gt 0 ]]; do
-    shift
-done
-
-while IFS= read -r line; do
-    [[ "$line" == *"${SCRATCH_TEST_PICK_MATCH}"* ]] || continue
-    print -r -- "$line"
-    exit 0
-done
-
-exit 1
+exec "${SCRATCH_REAL_FZF}" --filter "${SCRATCH_TEST_PICK_MATCH}" "$@"
 EOF
 chmod +x "${TEST_TMP}/bin/fzf"
 
 scratch "pick-one" > /dev/null 2>&1
 second_pick=$(scratch "pick-two" 2>&1 | grep "^${SCRATCH_DIR}")
+mkdir -p "${second_pick}/notes"
+echo "hello" > "${second_pick}/notes/needle.txt"
 cd "$START_DIR" || exit 1
 
 export PATH="${TEST_TMP}/bin:${PATH}"
-export SCRATCH_TEST_PICK_MATCH="pick-two."
+export SCRATCH_REAL_FZF="${REAL_FZF_BIN}"
+export SCRATCH_TEST_PICK_MATCH="needle.txt"
 
 picked_dir=$(scratch --pick)
 [[ "${picked_dir}" == "${second_pick}" ]] || { echo "FAIL: pick returned wrong path"; exit 1; }
