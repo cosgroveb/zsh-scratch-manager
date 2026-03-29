@@ -4,18 +4,7 @@
 
 A zsh plugin for creating temporary scratch directories with automatic cleanup.
 
-```zsh
-# .zshrc (^G is usually send-break, rarely used)
-bindkey '^G' scratch-widget
-```
-
-```zsh
-$ # press Ctrl+G
-~/scratch/tmp.x2Lm
-$ # hack away
-```
-
-Or add an alias:
+Add an alias:
 
 ```zsh
 # .zshrc
@@ -73,6 +62,7 @@ scratch -c, --cleanup    # Run cleanup now
 scratch --pick           # Pick an existing scratch directory and print its path
 sff                      # Convenience wrapper for scratch --pick
 sfp                      # Pick an existing scratch directory and pushd into it
+scratch-find-or-create   # Optional helper: pick an existing scratch or create a new one, then pushd
 scratch --help           # Show help
 ```
 
@@ -97,7 +87,7 @@ Add to your `.zshrc` after loading the plugin:
 ```zsh
 alias t='scratch'
 alias tt='scratch -t'
-bindkey '^G' scratch-widget   # Ctrl+G to create scratch
+bindkey '^G' scratch-widget
 ```
 
 If `fzf` is installed, `scratch --pick` uses it for interactive selection. If
@@ -105,6 +95,12 @@ If `fzf` is installed, `scratch --pick` uses it for interactive selection. If
 scratch directory. The picker sorts newest-first and also matches shallow file
 and path names inside each scratch directory, so you can type `Gemfile`,
 `notes`, or `src/app` even when every scratch name is `tmp.*`.
+
+Optional find-or-create keybinding:
+
+```zsh
+bindkey '^[o' scratch-find-or-create-widget   # Alt-o: open existing or create new
+```
 
 ## Auto-Cleanup
 

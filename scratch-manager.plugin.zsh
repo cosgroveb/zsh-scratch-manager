@@ -52,6 +52,11 @@ sfp() {
     echo "$scratch_dir"
 }
 
+scratch-find-or-create-widget() {
+    scratch-find-or-create && zle reset-prompt
+}
+zle -N scratch-find-or-create-widget
+
 # Widget for key binding (bind with: bindkey '^S' scratch-widget)
 scratch-widget() { scratch && zle reset-prompt }
 zle -N scratch-widget

@@ -74,4 +74,21 @@ sfp_output=$(<"${TEST_TMP}/sfp.out")
 [[ "${sfp_output}" == "${second_pick}" ]] || { echo "FAIL: sfp returned wrong path"; exit 1; }
 [[ "${PWD}" == "${second_pick}" ]] || { echo "FAIL: sfp did not change directory"; exit 1; }
 
+cd "$START_DIR" || exit 1
+export SCRATCH_TEST_PICK_MATCH="+ new scratch"
+
+scratch-find-or-create > "${TEST_TMP}/find_or_create_create.out" || { echo "FAIL: find-or-create create exited non-zero"; exit 1; }
+created_from_picker=$(<"${TEST_TMP}/find_or_create_create.out")
+[[ "${created_from_picker}" == "${SCRATCH_DIR}"/tmp.* ]] || { echo "FAIL: find-or-create did not create"; exit 1; }
+[[ -d "${created_from_picker}" ]] || { echo "FAIL: created scratch missing"; exit 1; }
+[[ "${PWD}" == "${created_from_picker}" ]] || { echo "FAIL: find-or-create did not cd after create"; exit 1; }
+
+cd "$START_DIR" || exit 1
+export SCRATCH_TEST_PICK_MATCH="needle.txt"
+
+scratch-find-or-create > "${TEST_TMP}/find_or_create_open.out" || { echo "FAIL: find-or-create open exited non-zero"; exit 1; }
+opened_from_picker=$(<"${TEST_TMP}/find_or_create_open.out")
+[[ "${opened_from_picker}" == "${second_pick}" ]] || { echo "FAIL: find-or-create selected wrong existing scratch"; exit 1; }
+[[ "${PWD}" == "${second_pick}" ]] || { echo "FAIL: find-or-create did not cd to existing scratch"; exit 1; }
+
 echo "PASS"
