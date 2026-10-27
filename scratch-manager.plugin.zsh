@@ -71,7 +71,10 @@ periodic() {
 }
 
 # Run cleanup on shell exit (async to avoid blocking shell exit)
+typeset -g _SCRATCH_SHELL_PID=$$
 _scratch_zshexit() {
+    # zpty children inherit this hook but must not clean up on exit.
+    [[ $$ == $_SCRATCH_SHELL_PID ]] || return 0
     { _scratch_cleanup } &>/dev/null &!
 }
 

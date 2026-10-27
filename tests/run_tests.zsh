@@ -91,4 +91,31 @@ opened_from_picker=$(<"${TEST_TMP}/find_or_create_open.out")
 [[ "${opened_from_picker}" == "${second_pick}" ]] || { echo "FAIL: find-or-create selected wrong existing scratch"; exit 1; }
 [[ "${PWD}" == "${second_pick}" ]] || { echo "FAIL: find-or-create did not cd to existing scratch"; exit 1; }
 
+zsh -fc '
+    source "$1"
+    cleanup_log=$2
+    print -r -- $$ > "$3"
+    _scratch_cleanup() { print -r -- $$ >> "$cleanup_log"; }
+    zmodload zsh/zpty
+    zpty scratch-exit-test exit
+    repeat 100; do
+        zpty -t scratch-exit-test || break
+        sleep 0.01
+    done
+    zpty -d scratch-exit-test
+    sleep 0.1
+    exit
+' -- "${SCRATCH_MANAGER_DIR}/scratch-manager.plugin.zsh" \
+    "${TEST_TMP}/exit-cleanup" "${TEST_TMP}/exit-owner" || exit 1
+
+repeat 100; do
+    [[ -s "${TEST_TMP}/exit-cleanup" ]] && break
+    sleep 0.01
+done
+[[ -s "${TEST_TMP}/exit-cleanup" ]] || { echo "FAIL: shell exit skipped cleanup"; exit 1; }
+[[ "$(<"${TEST_TMP}/exit-cleanup")" == "$(<"${TEST_TMP}/exit-owner")" ]] || {
+    echo "FAIL: zpty exit ran inherited cleanup"
+    exit 1
+}
+
 echo "PASS"
